@@ -44,9 +44,23 @@ function drawBall(){
 };
 //move ball 
 function moveBall(){
-    ball.x +=dx;
-    ball.y +=dy;
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+    if (ball.x+ball.radius > canvas.width){
+        ball.dx = -ball.dx;
+    } else if (ball.x-ball.radius < 0) {
+        ball.dx *= -1;
+    }
+    if (ball.y+ball.radius > canvas.height){
+        ball.dy = -ball.dy;
+    } else if (ball.y-ball.radius <0){
+        ball.dy *= -1;
+    }
+    if (ball.x+ball.radius > paddle.x || ball.x-ball.radius < paddle.w || ball.y+ball.radius > paddle.y){
+        
+    }
 }
+
 
 //draw score
 var score = 0;
@@ -70,40 +84,68 @@ function drawPaddle(){
     ctx.fill();
     ctx.closePath();
 };
+//move paddle 
+function movePaddle(){
+    paddle.x += paddle.dx;
+    
+    keyDown();
+    keyUp();
+    //wall detector
+    if (paddle.x < 0){
+        paddle.x = 0;
+    } else if (paddle.x+paddle.w < canvas.width){
+        paddle.x = canvas.width - paddle.w;
+    }
+
+}
+
+//eventlisteners
+document.addEventListener('keydown', (e)=>{
+    if (e.key === 'Right'||e.key ==='ArrowRight'){
+        paddle.dx = paddle.speed;
+    } else if (e.key ==='Left'||e.key ==='ArrowLeft'){
+        paddle.dx = -paddle.speed;
+    }
+});
+document.addEventListener('keyup', (e)=>{
+    if (e.key === 'Right'||e.key ==='ArrowRight'||e.key ==='Left'||e.key ==='ArrowLeft'){
+        paddle.dx = 0;
+    }
+})
 
 //create brick
-const brickInfo = {
-    w: 70,
-    h: 20,
-    padding: 10,
-    offsetX: 45,
-    offsetY: 60,
-    visible: true,
-}
-//creat many bricks
-const numberOfRow = 9;
-const numberOfColumn = 5;
-const bricks = [];
-for (let i=0; i<numberOfRow; i++){
-    bricks[i]=[];
-    for (let j=0;j<numberOfColumn; j++){
-        const x = i * (brickInfo.w + brickInfo.padding) + brickInfo.offsetX;
-        const y = j * (brickInfo.y + brickInfo.padding) + brickInfo.offsetY;
-        bricks[i][j]={x,y,...brickInfo};
-    }
-};
-//draw bricks
-function drawBricks(){
-    bricks.forEach(column => {
-        column.forEach(brick=>{
-            ctx.beginPath();
-            ctx.fillStyle = brick.visible? '#0095dd':'transparent';
-            ctx.rect(brick.x,brick.y,brick.w,brick.h);
-            ctx.fill();
-            ctx.closePath();
-        })
-    })
-}
+// const brickInfo = {
+//     w: 70,
+//     h: 20,
+//     padding: 10,
+//     offsetX: 45,
+//     offsetY: 60,
+//     visible: true,
+// }
+// //creat many bricks
+// const numberOfRow = 9;
+// const numberOfColumn = 5;
+// const bricks = [];
+// for (let i=0; i<numberOfRow; i++){
+//     bricks[i]=[];
+//     for (let j=0;j<numberOfColumn; j++){
+//         const x = i * (brickInfo.w + brickInfo.padding) + brickInfo.offsetX;
+//         const y = j * (brickInfo.y + brickInfo.padding) + brickInfo.offsetY;
+//         bricks[i][j]={x,y,...brickInfo};
+//     }
+// };
+// //draw bricks
+// function drawBricks(){
+//     bricks.forEach(column => {
+//         column.forEach(brick=>{
+//             ctx.beginPath();
+//             ctx.fillStyle = brick.visible? '#0095dd':'transparent';
+//             ctx.rect(brick.x,brick.y,brick.w,brick.h);
+//             ctx.fill();
+//             ctx.closePath();
+//         })
+//     })
+// }
 
 
 
@@ -111,18 +153,18 @@ function drawBricks(){
 
 //draw all
 function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
     drawBall();
     drawPaddle();
-    drawBricks();
+    // drawBricks();
     drawScore();
 };
-
-//animate
+//animate 
 function animate(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    requestAnimationFrame(animate);
     draw();
     moveBall();
-    requestAnimationFrame(animate);
-
+    movePaddle();
 }
 animate();
