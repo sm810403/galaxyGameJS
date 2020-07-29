@@ -25,25 +25,38 @@ btn2.addEventListener('click', ()=> {
 //move ball/
 //move paddle/
 //update wall collision/
-//update brick collision
-//update score and reset
+//update brick collision/
+//update score and reset/
+//restart screen and button/
+//start button on canvas/
+//create Lv
+//congrat screen
+//Lv increment && speed increment&& size of paddle shorter&& numberOfBalls increase
 const ball = {
-    x: canvas.width /2,
+    x: canvas.width/2,
     y: canvas.height/2 +80,
     radius: 10,
     speed: 4,
-    dx: 4,
-    dy: -4,
+    dx: 0,
+    dy: 0,
 };
+// //add ball
+// var balls = [];
+// function addBall(){
+
+// }
+
+//draw ball
 function drawBall(){
     ctx.beginPath();
     ctx.arc(ball.x,ball.y,ball.radius, 0, Math.PI*2,false);
-    ctx.fillStyle = '#0095dd';
+    ctx.fillStyle = 'red';
     ctx.fill();
     ctx.closePath();
 };
 //move ball 
 function moveBall(){
+    startGame();
     ball.x += ball.dx;
     ball.y += ball.dy;
     if (ball.x+ball.radius > canvas.width||ball.x-ball.radius < 0){
@@ -57,6 +70,102 @@ function moveBall(){
         ball.y+ball.radius > paddle.y){
         ball.dy = -ball.speed;
     }
+
+    //detect brick collision
+    bricks.forEach(column =>{
+        column.forEach(brick =>{
+            if (brick.visible){
+                if (ball.x-ball.radius > brick.x & 
+                    ball.x+ball.radius < brick.x+brick.w && 
+                    ball.y+ball.radius > brick.y &&
+                    ball.y-ball.radius < brick.y+brick.h){
+                        ball.dy *= -1;
+                        brick.visible = false;
+                        updateScore(bricks);
+                }
+            }
+        })
+    });
+    //dead
+    if (ball.y+ball.radius > canvas.height){
+        // alert('You are dead!  Press Enter to restart.');
+        score = 0;
+        level = 1;
+        paddle.x = canvas.width/2-50;
+        showAllBricks();
+        ball.dx = 0;
+        ball.dy = 0;
+        document.querySelector('.overlay').style.display = 'block';
+        restart(); 
+    }
+}
+//restart game
+function restart(){
+    document.querySelector('.reBtn').addEventListener('click', function(){
+        document.querySelector('.overlay').style.display = 'none';
+        startBtn.style.display = 'block';
+        ball.x = Math.random()*canvas.width;
+        ball.y = canvas.height /2+80;
+        paddle.speed = 0;
+        startGame();
+    })
+}
+//start btn on canvas
+var startBtn = document.querySelector('.startBtn');
+function startGame(){
+    startBtn.addEventListener('click', function(){
+        startBtn.style.display = 'none';
+        paddle.speed = 8;
+        ball.dx = 5;
+        ball.dy = -5;
+
+    })
+}
+
+
+//update score 
+function updateScore(brick){
+    score++;
+    if (score%(numberOfColumn*numberOfRow)===0){
+        score = 0;
+        level++;
+        // addBall();
+        changePaddleSize();
+        speedUp();
+        showAllBricks();      
+    }
+
+    if (level === 3){
+        congratulate();
+        startBtn.style.display = 'none';
+    }
+}
+//congratulate
+function congratualte(){
+    setTimeout(congratDuration, 4000);
+    clearTimeout(congratDuration);
+}
+//duration for congrat
+function congratDuration(){
+    document.querySelector('.cong').style.display = 'block'
+}
+//show all bricks
+function showAllBricks(){
+    bricks.forEach(column=>{
+        column.forEach(brick =>{
+            brick.visible = true;
+        })
+    })
+}
+//change paddel size
+function changePaddleSize() {
+    paddle.w -= 20;
+}
+//speed up 
+function speedUp(){
+    ball.dx += 2;
+    ball.dy += 2;
+    ball.speed += 2;
 }
 
 
@@ -66,19 +175,25 @@ function drawScore(){
     ctx.font = '20px arial';
     ctx.fillText(`Score: ${score}`,canvas.width - 100, 30);
 }
+//draw LV
+var level = 1;
+function drawLevel(){
+    ctx.font = '20px arial';
+    ctx.fillText(`LV: ${level}`, 20, 30);
+}
 //create paddle
 const paddle = {
     x: canvas.width/2-50,
     y: canvas.height- 40,
     w: 100,
     h: 20,
-    speed: 8,
+    speed: 0,
     dx: 0,
 }
 function drawPaddle(){
     ctx.beginPath();
     ctx.rect(paddle.x, paddle.y, paddle.w,paddle.h);
-    ctx.fillStyle = '#0095dd';
+    ctx.fillStyle = 'black';
     ctx.fill();
     ctx.closePath();
 };
@@ -146,18 +261,14 @@ function drawBricks(){
     })
 }
 
-
-
-
-
 //draw all
 function draw(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
     drawBricks();
     drawBall();
     drawPaddle();
-    // drawBricks();
     drawScore();
+    drawLevel();
 };
 
 //animate 
