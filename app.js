@@ -40,11 +40,6 @@ const ball = {
     dx: 0,
     dy: 0,
 };
-// //add ball
-// var balls = [];
-// function addBall(){
-
-// }
 
 //draw ball
 function drawBall(){
@@ -71,6 +66,7 @@ function moveBall(){
         ball.dy = -ball.speed;
     }
 
+    
     //detect brick collision
     bricks.forEach(column =>{
         column.forEach(brick =>{
@@ -129,25 +125,21 @@ function updateScore(brick){
     if (score%(numberOfColumn*numberOfRow)===0){
         score = 0;
         level++;
-        // addBall();
         changePaddleSize();
         speedUp();
-        showAllBricks();      
+        setTimeout(showAllBricks, 1000); 
+            
     }
 
-    if (level === 3){
+    if (level > 2){
         congratulate();
         startBtn.style.display = 'none';
     }
 }
 //congratulate
-function congratualte(){
-    setTimeout(congratDuration, 4000);
-    clearTimeout(congratDuration);
-}
-//duration for congrat
-function congratDuration(){
-    document.querySelector('.cong').style.display = 'block'
+function congratulate(){
+     document.querySelector('.cong').style.display = 'block'
+    
 }
 //show all bricks
 function showAllBricks(){
@@ -157,6 +149,7 @@ function showAllBricks(){
         })
     })
 }
+
 //change paddel size
 function changePaddleSize() {
     paddle.w -= 20;
@@ -247,7 +240,6 @@ for (let i=0; i<numberOfRow; i++){
         bricks[i][j]={x,y,...brickInfo};
     }
 };
-console.log(bricks);
 // //draw bricks
 function drawBricks(){
     bricks.forEach(column => {
