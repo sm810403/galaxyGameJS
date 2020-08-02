@@ -60,7 +60,7 @@ function moveBall(){
     if (ball.y+ball.radius > canvas.height||ball.y-ball.radius <0){
         ball.dy *= -1;
     }
-    if (ball.x-ball.radius > paddle.x & 
+    if (ball.x-ball.radius > paddle.x && 
         ball.x+ball.radius < paddle.x+paddle.w && 
         ball.y+ball.radius > paddle.y){
         ball.dy = -ball.speed;
